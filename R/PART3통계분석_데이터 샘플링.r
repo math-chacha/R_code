@@ -21,21 +21,24 @@
 ##    ex. 우리나라 시도를 무작위 선택 후 선택된 시도에서 군과 구를 무작위 선정, 다시 읍면동 선정한 후 해당 읍면동에 속한 주민등록번호를 무작위로 선택해 표본 추출
 
 ## R을 이용한 표본 추출
-## 1.단순 임의 추출법(simple random sampling)
+## 1.단순 임의 추출
 ##   sample(x, size, replace=FALSE, prop=NULL)  x : 표본 추출 벡터 / size : 표본 크기 / replace : 복원추출여부 / prob : 데이터 뽑을 때 가중치 지정
 ##   example (iris 데이터 7:3 추출)
-print("hi")
 train_idx <- sample(c(1:nrow(iris)), size = 0.7 * nrow(iris), replace=FALSE) 
 train_df <- iris[train_idx,]
 test_df <- iris[-train_idx,]
+cat(nrow(iris),nrow(train_df),nrow(test_df)) # 150, 105, 45
 
-
-
-
-
-
-
-
+## 2. 층화 임의 추출
+##    sampling::strata(data, stratanames=NULL,size, method = c("srswor","srswr","poisson","systematic"), pik, description=FALSE)
+##    stratanames : 계층 구분 변수 / method : 차례로 비복원단순임의추출, 복원단순임의추출, 포아송추출, 계통추출 / pik : 데이터를 표본에 포함시킬 확률 / description : 표본크기와 모집단 크기 추출할지 여부
+##    getdata(data,m) m : 추출된 벡터 혹은 데이터 프레임
+##    strata 함수 통해 층화 임의 추출한 데이터는 getdata함수 통해 확인 가능
+##    example(iris에서 Species별 20,15,15 층화임의추출)
+library(sampling)
+sample <- sampling::strata(data = iris, stratanames=c("Species"), size = c(20,15,15), method="srswor")
+iris_sample <- getdata(iris, sample)
+table(iris_sample$Species) # setosa : 20 / versicolor : 15 / virginica : 15
 
 
 
