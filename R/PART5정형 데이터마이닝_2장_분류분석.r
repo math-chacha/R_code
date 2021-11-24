@@ -138,4 +138,4 @@ plotcp(dt_credit) # 나무의 크기가 6일 때 최적의 나무(split 5)
 
 # 예측
 library(caret)
-pred_dt <- 
+pred_dt <- predict(dt_credit, test[,-1])
