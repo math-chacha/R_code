@@ -1,4 +1,4 @@
-# 윤종식, 『ADP 실기 데이터 분석 전문가』, (주)데이터에듀-2020, 244-299
+# 윤종식, 『ADP 실기 데이터 분석 전문가』, (주)데이터에듀-2020, 244-261
 
 # 분류분석
 # 활용 데이터 : credit 은행 자금 대출 신청한 1000명의 자산 신용 관련 데이터 (credit_final.csv)
@@ -42,8 +42,8 @@ summary(step_lr_credit) # 20개 중 15개 변수 유의
 
 # 예측
 library(caret)
-pred <- predict(step_lr_credit, test[,-1], type="response")  # test 데이터에서 종속변수 빼고 넣기, 확률값 산출(response)
-pred1 <- as.data.frame(pred)
+pred_lr <- predict(step_lr_credit, test[,-1], type="response")  # test 데이터에서 종속변수 빼고 넣기, 확률값 산출(response)
+pred1 <- as.data.frame(pred_lr)
 pred1$grade <- ifelse(pred1$pred < 0.5, 0, 1) # 확률값 활용해 범주 예측
 
 # 오분류표(factor)
@@ -138,4 +138,33 @@ plotcp(dt_credit) # 나무의 크기가 6일 때 최적의 나무(split 5)
 
 # 예측
 library(caret)
-pred_dt <- 
+pred_dt <- predict(dt_credit, test[,-1], type="class")
+
+# 오분류표
+confusionMatrix(pred_dt, test[,1], positive='1') # Accuracy : 0.7533 / Sensitivity : 0.8976 / Specificity : 0.4421
+
+# ROC
+library(ROCR)
+pred_dt_credit <- prediction(as.numeric(pred_dt), as.numeric(test[,1]))
+plot(performance(pred_dt_credit, "tpr","fpr")) # ROC
+performance(pred_dt_credit,"auc")@y.values # AUROC : 0.6698331
+
+
+## example(3개 이상 범주의 의사결정나무 iris train : test = 7:3)
+# 분할
+idx <- sample(1:nrow(iris), 0.7*nrow(iris), replace=FALSE)
+train <- iris[idx,]
+test <- iris[-idx,]
+
+# 모형 적합
+library(rpart)
+library(rpart.plot)
+multi_dt_iris <- rpart(Species ~ ., data= train)
+prp(multi_dt_iris, type = 4, extra = 2)
+
+# 예측
+pred <- predict(multi_dt_iris, test[,-5], type="class")
+
+# 오분류표
+library(caret)
+confusionMatrix(pred, test[,5]) # Accuracy 1 / class 별 타 특이도, 민감도 
