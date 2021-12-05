@@ -21,7 +21,7 @@
 ##       정규분포 만족 -> t.test(x, alternative=c("two.sided","less","greater"), mu=0)
 ##       정규분포 불만족 -> wilcox.test(x, alternative=c("two.sided","less","greater"), mu=0)
 ##    example (iris Sepal.Length 평균이 5.5인지)
-shapiro.test(iris$Sepal.Length) # p-value : 0.01018 -> 정규분포 불만족
+shapiro.test(iris$Sepal.Length) # p-value : 0.01018 -> 정규분포 만족
 wilcox.test(iris$Sepal.Length, alternative="two.sided",mu=5.5) # p-value : 9.105e-06 -> 평균 5.5라는 귀무가설 기각!
 
 
