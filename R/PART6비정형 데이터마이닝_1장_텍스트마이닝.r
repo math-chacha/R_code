@@ -201,3 +201,64 @@ wordcloud(words=names(term.freq),  # 빈도 계산한 것의 이름만
           scale = c(8,3),
           colors=brewer.pal(8,'Dark2'))
 #dev.off() # 그림 저장
+
+
+## 영어 텍스트 마이닝 예시
+library(tm)
+data(crude)
+summary(crude)[1:6,] 
+class(crude) # 이미 Corpus
+inspect(crude[1]) # 문서의 character 수 등 확인 가능
+
+crude[[1]]$content # 내용 확인
+
+clean_corpus <- function(txt){
+    txt <- tm_map(txt,content_transformer(tolower))
+    txt <- tm_map(txt, removeNumbers) # 숫자 제거
+    txt <- tm_map(txt, removePunctuation) # 문장부호 제거
+    txt <- tm_map(txt, stripWhitespace) # 공백 제거(여러 공백을 하나의 공백으로 변환)
+    return(txt)
+}
+clean_crude <- clean_corpus(crude) # 텍스트 전처리
+
+crudestopwords <- c(stopwords('english'), "reuter", " will", "also", "said", "one", "last")
+clean_crude <- tm_map(clean_crude, removeWords, crudestopwords)  # 불용어 처리
+
+clean_crude <- tm_map(clean_crude, stemDocument)  # 불용어 처리
+
+crude_tdm <- TermDocumentMatrix(clean_crude) # TDM
+crude_mat <- as.matrix(crude_tdm)
+crude_freq <- sort(rowSums(crude_mat), decreasing=T)
+d <- data.frame(word = names(crude_freq), freq = crude_freq)
+
+library(wordcloud)
+wordcloud(words=names(crude_freq),  # 빈도 계산한 것의 이름만
+          freq=crude_freq,   # 빈도
+          min.freq=15,       # 그림으로 그릴 최소 빈도
+          random.order=F,
+          scale = c(8,3),
+          colors=brewer.pal(8,'Dark2'))
+palete <- brewer.pal(7, "Set3")
+wordcloud(names(crude_freq),freq=crude_freq,scale=c(5,1),min.freq=15,colors=palete,random.order=F, random.color=T)
+
+
+
+# 형태소 추출
+#install.packages("openNLP")
+library(openNLP)
+
+
+extractPOS <- function(x, thisPOSregex) {
+    x <- as.String(x)
+    wordAnnotation <- annotate(x, list(Maxent_Sent_Token_Annotator(), Maxent_Word_Token_Annotator()))
+    POSAnnotation <- annotate(x, Maxent_POS_Tag_Annotator(), wordAnnotation)
+    POSwords <- subset(POSAnnotation, type == "word")
+    tags <- sapply(POSwords$features, '[[', "POS")
+    thisPOSindex <- grep(thisPOSregex, tags)
+    tokenizedAndTagged <- sprintf("%s/%s", x[POSwords][thisPOSindex], tags[thisPOSindex])
+    untokenizedAndTagged <- paste(tokenizedAndTagged, collapse = " ")
+    untokenizedAndTagged
+}
+
+tmp <- lapply(clean_crude, extractPOS, "NN$")
+library(stringr)
