@@ -26,3 +26,20 @@ ss <- supersom(train, gr, rlen = 200, alpha = c(0.05,0.01))
 # rlen : 학습횟수
 # alpha : learning rate로 0.05로 시작해 0.01까지 학습
 
+summary(ss)
+
+# 군집화잘 되었는지 시각화하면서 확인
+# 학습이 진행될수록 경쟁층 뉴런과 입력 데이터 거리 짧아짐을 확인
+plot(ss, type="changes")
+
+# som 모델의 각 뉴런이 몇 개의 입력 데이터와 맵핑되는지 확인
+plot(ss, type="count", main="Node Counts")
+
+
+# 경쟁층 뉴런에 속한 입력층의 친구들(Species)이 누군지 확인
+plot(ss, type="codes")
+
+# 예측
+test.pred <- predict(ss, test)
+test.pred$predictions$Species
+table(test.pred$predictions$Species, test$Species)
