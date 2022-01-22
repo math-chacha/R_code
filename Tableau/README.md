@@ -8,6 +8,5 @@ Tableau Study
 - http://tableauwiki.com/tableau-dashboard-example-baseball-data-analysis/ 
 참고
 
---
-My Public Tableau Account(you can check my output) 
-https://public.tableau.com/app/profile/.64877440
+My Public Tableau Account(you can check my output)  
+- https://public.tableau.com/app/profile/.64877440
